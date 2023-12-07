@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  </head>
+  <body>
+    <div class="pokedex">
+      <h1 class="poke-title">Pokedex</h1>
+      <div class="pokedex-search-box">
+        <div class="pokedex-info">
+          <div class="pokedex-search-info">
+            <div class="pokedex-search-requests">
+              <div class="pokedex-search-input-container">
+                <h2 class="pokedex-search-text">Find a new pokemon by name</h2>
+                <input id="poke-search" type="text" class="pokedex-search" placeholder="Pikachu">
+                <button onclick={handlePokeSearch()} class="btn pokedex-search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <h3 id="pokemon-search-result"></h3>
+              </div>
+              <div class="pokedex-search-request">
+                <h2 class="pokedex-search-text">Search for pokemon by name in your pokedex</h3>
+                <input onkeyup={handlePokedexSearch()} id="pokedex-search" class="pokedex-search" placeholder="squirtle" type="text">
+                <button class="btn pokedex-search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+              </div>
+            </div>
+            <div class="pokemon-stats-container">
+              <div class="abc-dec pokemon-stat">ABC+</div>
+              <div class="num-dec pokemon-stat">Id+</div>
+              <div class="hp-dec pokemon-stat">HP+</div>
+              <div class="atk-dec pokemon-stat">ATK+</div>
+              <div class="def-dec pokemon-stat">DEF+</div>
+              <div class="abc-inc pokemon-stat">ABC-</div>
+              <div class="num-inc pokemon-stat">Id-</div>
+              <div class="hp-inc pokemon-stat">HP-</div>
+              <div class="atk-inc pokemon-stat">ATK-</div>
+              <div class="def-inc pokemon-stat">DEF-</div>
+            </div>
+          </div>
+          <div class="pokedex-search-info">
+
+          </div>
+        </div>
+        <h2 onclick={seeAll()} class="see-all-pokemon">All Pokemon</h2>
+        <h2 onclick={seeFav()} class="pokedex-sort-text">Favorite Pokemon</h3>
+        <!-- add sort stuff -->
+      </div>
+      <div class="pokemon-weights">
+        <div onclick={filterLightPokemon()} class="weight-count light-count"></div>
+        <div onclick={filterAveragePokemon()} class="weight-count average-count"></div>
+        <div onclick={filterHeavyPokemon()} class="weight-count heavy-count"></div>
+      </div>
+      <div class="pokemon">
+        
+      </div>
+    </div>
+    
+    <script src="rad.js" async defer></script>
+  </body>
+</html>
