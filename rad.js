@@ -10,13 +10,15 @@ const squirtle = fetch('https://pokeapi.co/api/v2/pokemon/squirtle');
 const wartortle = fetch('https://pokeapi.co/api/v2/pokemon/wartortle');
 const blastoise = fetch('https://pokeapi.co/api/v2/pokemon/blastoise');
 const pikachu = fetch('https://pokeapi.co/api/v2/pokemon/pikachu');
-const ditto = fetch('https://pokeapi.co/api/v2/pokemon/ditto');
+const pichu = fetch('https://pokeapi.co/api/v2/pokemon/pichu');
 const clefairy = fetch('https://pokeapi.co/api/v2/pokemon/clefairy');
 
 const observerConfig = { childList: true, subtree: true };
 
 function addHiddenClass (elm) {
-  elm.classList.add('hidden');
+  if (!elm.classList.contains('hidden')) {
+    elm.classList.add('hidden')
+  }
   return elm
 }
 
@@ -57,28 +59,12 @@ const filterHeavyPokemon = () => {
 
 function filterPokemonWeight(weight) {
   const pokemonCards = Array.from(document.querySelectorAll('.pokemon-card'));
-  const pokemon = document.querySelector('.pokemon')
-  const filteredCards = pokemonCards.filter((card) => card.dataset.weightType == weight);
-  pokemon.innerHTML = '';
-  filteredCards.forEach((card) => {
-    pokemon.appendChild(card);
-  })
+  const filteredOutCards = pokemonCards.filter((card) => card.dataset.weightType !== weight);
+  filteredOutCards.forEach((card) => addHiddenClass(card))
+  const filteredCards = pokemonCards.filter((card) => card.dataset.weightType === weight)
+  filteredCards.forEach((card) => removeHiddenClass(card));
   updateDisplay()
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function updateDisplay() {
   handlePokeWeights();
@@ -277,8 +263,10 @@ function eventPokemonStats() {
 }
 
 function seeAll() {
-  const pokeCards = JSON.parse(localStorage.getItem('pokemon'));
-  loadLocalPokemon(pokeCards);
+  const pokeCards = document.querySelectorAll('.pokemon-card');
+  pokeCards.forEach((card) => removeHiddenClass(card))
+  const localPokeCards = JSON.parse(localStorage.getItem('pokemon'));
+  loadLocalPokemon(localPokeCards);
   updateDisplay();
 }
 
@@ -465,7 +453,10 @@ function addPokemonCardSearch(data, updateLocal) {
   return data;
 }
 
-
+function handleOnclickApiSearch () {
+  const pokemon = document.getElementById('poke-search');
+  findPokemon(pokemon.value, true)
+}
 // returns pokemon data from api
 function findPokemon(input, updateLocal) {
   return new Promise(function(resolve, reject){
@@ -473,14 +464,15 @@ function findPokemon(input, updateLocal) {
     fetch(pokeApiSearch)
       .then((response) => response.json())
       .then((response) => addPokemonCardSearch(response, updateLocal))
+      .then(handlePokeSearch())
       .catch((error) => {
         const pokemonTextContainer = document.getElementById('pokemon-search-result');
         pokemonTextContainer.innerHTML = '';
         const failedPokemonText = document.createTextNode(`Failed to find ${input}`)
         pokemonTextContainer.appendChild(failedPokemonText);
+        return error;
       });
   })
-
 }
 
 // loads requested pokemon on screen
@@ -531,7 +523,7 @@ function handlePokedexSearch() {
     }
   }
   if (pokemonSearch.value === '') {
-    loadLocalPokemon(curPokemonArray)
+    loadLocalPokemon(curPokemonArray);
   }
   return loadLocalPokemon(possiblePokemonArray);
 }
@@ -539,7 +531,7 @@ function handlePokedexSearch() {
 
 
 Promise
-  .all([bulbasaur, ivysaur, venusaur, charmander, charmeleon, charizard, squirtle, wartortle, blastoise, pikachu, ditto, clefairy])
+  .all([bulbasaur, ivysaur, venusaur, charmander, charmeleon, charizard, squirtle, wartortle, blastoise, pikachu, pichu, clefairy])
   .then((response) => {
     return Promise.all(response.map((res) => res.json()));
   })
