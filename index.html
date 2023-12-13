@@ -18,7 +18,7 @@
             <div class="pokedex-search-requests">
               <div class="pokedex-search-input-container">
                 <h2 class="pokedex-search-text">Find a new pokemon by name</h2>
-                <input id="poke-search" type="text" class="pokedex-search" placeholder="Pikachu">
+                <input id="poke-search" type="text" class="pokedex-search" placeholder="pikachu">
                 <button onclick={handleOnclickApiSearch()} class="btn pokedex-search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
                 <h3 id="pokemon-search-result"></h3>
               </div>
@@ -41,18 +41,17 @@
               <div class="def-inc pokemon-stat">DEF-</div>
             </div>
           </div>
-          <div class="pokedex-search-info">
-
-          </div>
         </div>
-        <h2 onclick={seeAll()} class="see-all-pokemon">All Pokemon</h2>
-        <h2 onclick={seeFav()} class="pokedex-sort-text">Favorite Pokemon</h3>
+        <div class="fav-all-pokemon">
+          <button onclick={seeAll()} class="see-all-pokemon">All Pokemon</button>
+          <button onclick={seeFav()} class="see-fav-pokemon">Favorite Pokemon</button>
+        </div>
+        <div class="pokemon-weights">
+          <div onclick={filterLightPokemon()} class="weight-count light-count"></div>
+          <div onclick={filterAveragePokemon()} class="weight-count average-count"></div>
+          <div onclick={filterHeavyPokemon()} class="weight-count heavy-count"></div>
+        </div>
         <!-- add sort stuff -->
-      </div>
-      <div class="pokemon-weights">
-        <div onclick={filterLightPokemon()} class="weight-count light-count"></div>
-        <div onclick={filterAveragePokemon()} class="weight-count average-count"></div>
-        <div onclick={filterHeavyPokemon()} class="weight-count heavy-count"></div>
       </div>
       <div class="pokemon">
         

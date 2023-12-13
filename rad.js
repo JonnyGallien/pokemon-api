@@ -325,11 +325,19 @@ function handleFavPokemonLs(e) {
   }
 }
 
+function heartAnimation(heart) {
+  heart.classList.add('animated-heartbeat');
+  setTimeout(() => {
+    heart.classList.remove('animated-heartbeat');
+  }, 1500);
+}
+
 function addEventListenersForHeart() {
   const pokemonContainer = document.querySelector('.pokemon');
   pokemonContainer.addEventListener('click', (event) => {
     if (event.target.classList.contains('heart-icon')) {
       toggleFav(event.target.getAttribute('id'));
+      heartAnimation(event.target)
       handleFavPokemonLs(event.target);
     } else if (event.target.parentElement.classList.contains('delete-btn')) {
       toggleDelete(event.target);
