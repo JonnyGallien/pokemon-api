@@ -11,6 +11,19 @@
   background-color: rgba(42, 56, 147, 0.5);
 }
 
+.pokedex-search, .pokedex-search-btn {
+  border: none;
+  padding: 2px;
+  font-size: 1rem;
+  background-color: tan;
+  padding: 2px 4px;
+}
+
+.pokedex-search-btn:hover {
+  cursor: pointer;
+  animation: bounce 1s;
+}
+
 .pokedex-search-requests {
   display: flex;
   text-align: center;
@@ -26,11 +39,10 @@ background-color: tan;
 display: flex;
 flex-wrap: wrap;
 justify-content: space-around;
-margin: 0 3%;
-padding: 0.5rem;
-gap: 0.5rem;
+margin: 0 16px;
+padding: 8px;
+gap: 8px;
 flex: 5;
-width: 94%;
 }
 
 .pokemon-stat {
@@ -239,6 +251,14 @@ i.is-fav {
 
 [disabled] {
   display: none;
+}
+
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  25% {transform :translateY(-6px);}
+  50% {transform: translateY(0);}
+  75% {transform: translateY(-4px);}
+  100% {transform: translateY(0);}
 }
 
 @keyframes heartbeat {
