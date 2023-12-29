@@ -1,17 +1,18 @@
 const pokemonBaseUrl = "https://pokeapi.co/api/v2"
 
-const bulbasaur = fetch('https://pokeapi.co/api/v2/pokemon/bulbasaur');
-const ivysaur = fetch('https://pokeapi.co/api/v2/pokemon/ivysaur');
-const venusaur = fetch('https://pokeapi.co/api/v2/pokemon/venusaur');
-const charmander = fetch('https://pokeapi.co/api/v2/pokemon/charmander');
-const charmeleon = fetch('https://pokeapi.co/api/v2/pokemon/charmeleon');
-const charizard = fetch('https://pokeapi.co/api/v2/pokemon/charizard');
-const squirtle = fetch('https://pokeapi.co/api/v2/pokemon/squirtle');
-const wartortle = fetch('https://pokeapi.co/api/v2/pokemon/wartortle');
-const blastoise = fetch('https://pokeapi.co/api/v2/pokemon/blastoise');
-const pikachu = fetch('https://pokeapi.co/api/v2/pokemon/pikachu');
-const pichu = fetch('https://pokeapi.co/api/v2/pokemon/pichu');
-const clefairy = fetch('https://pokeapi.co/api/v2/pokemon/clefairy');
+// Array of Pokemon names for base pokemon if localstorage is empty
+const pokemonNames = [
+  'bulbasaur', 'ivysaur', 'venusaur', 'charmander', 'charmeleon', 'charizard',
+  'squirtle', 'wartortle', 'blastoise', 'pikachu', 'pichu', 'clefairy'
+];
+
+// Create an array of promises for each Pokemon used at the bottom of file
+const pokemonPromises = pokemonNames.map((name) => {
+  const url = `${pokemonBaseUrl}/pokemon/${name}`;
+  return fetch(url).then((response) => response.json());
+});
+
+const basePokemon = 0;
 
 const observerConfig = { childList: true, subtree: true };
 
@@ -70,146 +71,11 @@ function updateDisplay() {
   handlePokeWeights();
 }
 
-function createPokemonAbilities(data) {
-  const abilitiesDiv = document.createElement('div');
-  abilitiesDiv.classList.add('pokemon-abilities')
-  const abilitiesText = document.createElement('h3');
-  const abilitiesTextNode = document.createTextNode('Abilities');
-  abilitiesText.appendChild(abilitiesTextNode);
-  abilitiesText.classList.add('med-text');
-  abilitiesDiv.appendChild(abilitiesText);
-  for (index in data.abilities) {
-    const newP = document.createElement('p');
-    const newPNode = document.createTextNode(`${data.abilities[index].ability.name}`);
-    newP.classList.add('small-text');
-    newP.appendChild(newPNode);
-    abilitiesDiv.appendChild(newP);
-  }
-  return abilitiesDiv;
-}
-
-function createPokemonTypes(data) {
-  const pokeTypes = document.createElement('div');
-  const pokeTypesTitle = document.createElement('h3');
-  const pokeTypesTitleNode = document.createTextNode('Types');
-  const thisData = data.types;
-  pokeTypesTitle.classList.add('med-text');
-  pokeTypesTitle.append(pokeTypesTitleNode);
-  pokeTypes.appendChild(pokeTypesTitle);
-  pokeTypes.classList.add('pokemon-types');
-  if (thisData.length === data.abilities.length) {
-    for (let i = 0; i < thisData.length; i++) {
-      const pokeType = document.createElement('p');
-      const pokeTypeNode = document.createTextNode(`${thisData[i].type.name}`);
-      pokeType.setAttribute('type', thisData[i].type.name);
-      pokeType.appendChild(pokeTypeNode);
-      pokeType.classList.add('small-text');
-      pokeTypes.appendChild(pokeType);
-    }
-  } else {
-    for (let i = 0; i < data.abilities.length; i++) {
-      const pokeType = document.createElement('p');
-      const pokeTypeNode = document.createTextNode(`${data.types[0].type.name}`);
-      pokeType.setAttribute('type', thisData[0].type.name);
-      pokeType.appendChild(pokeTypeNode);
-      pokeType.classList.add('small-text');
-      pokeTypes.appendChild(pokeType);
-    }
-  }
-  return pokeTypes;
-}
-
-function createFavBtn(data) {
-  const favPokeIds = JSON.parse(localStorage.getItem('fav-pokemon'));
-  const favBtn = document.createElement('div');
-  favBtn.classList.add('fav-btn');
-  const heart = document.createElement('i');
-  heart.classList.add('fa-solid');
-  heart.classList.add('fa-heart');
-  heart.classList.add('heart-icon');
-  heart.setAttribute('id', `heart-${data.id}`);
-  if (favPokeIds !== null) {
-    if (favPokeIds.includes(String(data.id))) {
-      heart.classList.add('is-fav');
-    }
-  }
-  favBtn.appendChild(heart);
-  return favBtn;
-}
-
-function createDeleteBtn() {
-  const deleteBtn = document.createElement('div');
-  deleteBtn.classList.add('delete-btn');
-  const xBtn = document.createElement('i');
-  xBtn.classList.add('fa-solid');
-  xBtn.classList.add('fa-x');
-  deleteBtn.appendChild(xBtn);
-  return deleteBtn;
-}
-
-function combineFavDeleteBtns(fav, del) {
-  const favDeleteBar = document.createElement('div');
-  favDeleteBar.classList.add('fav-delete-bar');
-  favDeleteBar.appendChild(fav);
-  favDeleteBar.appendChild(del)
-  return favDeleteBar
-}
-
-function createImgWrap(data) {
-  const imgWrap = document.createElement('div');
-  const pokeImg = document.createElement('img');
-  pokeImg.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${data.id}.png`;
-  imgWrap.classList.add('pokemon-img-wrapper');
-  imgWrap.appendChild(pokeImg);
-  return imgWrap;
-}
-
-function createAtkHpDef(data) {
-  const pokeBar = document.createElement('div');
-  pokeBar.classList.add('pokemon-power-bar');
-  const pokeAtk = document.createElement('div');
-  const pokeHp = document.createElement('div');
-  const pokeDef = document.createElement('div');
-  const pokeAtkNode = document.createTextNode('ATK: ' + data.stats[1].base_stat);
-  const pokeHpNode = document.createTextNode('HP: ' + data.stats[0].base_stat);
-  const pokeDefNode = document.createTextNode('DEF: ' + data.stats[2].base_stat);
-  pokeAtk.append(pokeAtkNode);
-  pokeHp.append(pokeHpNode);
-  pokeDef.append(pokeDefNode);
-  pokeBar.appendChild(pokeAtk);
-  pokeBar.appendChild(pokeHp);
-  pokeBar.appendChild(pokeDef);
-  return pokeBar;
-}
-
-function createPokeName(data) {
-  const pokeName = document.createElement('h2');
-  const pokeNameNode = document.createTextNode(`${data.name}`);
-  pokeName.classList.add('lg-text');
-  pokeName.appendChild(pokeNameNode);
-  return pokeName;
-}
-
-function createPokeId(data) {
-const pokeId = document.createElement('p');
-const pokeIdNode = document.createTextNode(`#${data.id}`)
-pokeId.appendChild(pokeIdNode);
-pokeId.classList.add('small-text');
-return pokeId;
-}
-
-function combineAbilitiesTypes(ability, type) {
-  const newDiv = document.createElement('div');
-  newDiv.classList.add('pokemon-abilities-types')
-  newDiv.appendChild(ability);
-  newDiv.appendChild(type);
-  return newDiv;
-}
-
 const defaultCompare = (a, b) => {
   return a.dataset.name.toString().localeCompare(b.dataset.name.toString());
 }
 
+//sorts pokemon by name
 function handlePokemonNameSorting(direction, pokeCards) {
   pokeCards.sort(defaultCompare);
   direction === 'dec' 
@@ -217,6 +83,7 @@ function handlePokemonNameSorting(direction, pokeCards) {
   : pokeCards.reverse();
 }
 
+//sorts pokemon by atk, def, hp, or id dependant upon input(thisStat)
 function handlePokemonSorting(thisStat, direction, pokeCards) {
   pokeCards.sort((a, b) => {
     let idA = null;
@@ -263,10 +130,10 @@ function eventPokemonStats() {
 }
 
 function seeAll() {
-  const pokeCards = document.querySelectorAll('.pokemon-card');
-  pokeCards.forEach((card) => removeHiddenClass(card))
-  const localPokeCards = JSON.parse(localStorage.getItem('pokemon'));
-  loadLocalPokemon(localPokeCards);
+  const pokemonData = JSON.parse(localStorage.getItem('pokemon'))
+  const pokemonCards = createPokemonCards(pokemonData);
+  pokemonCards.map((card) => checkFavPokemonLs(card));
+  loadPokemon(pokemonCards);
   updateDisplay();
 }
 
@@ -281,22 +148,18 @@ function seeFav() {
 }
 
 function toggleFav(id) {
-  console.log('fav-attempt')
   const fav = 'is-fav';
   const heartBtn = document.getElementById(id);
-  if (heartBtn !== undefined) {
-    heartBtn.classList.contains(fav)
-    ? heartBtn.classList.remove(fav)
-    : heartBtn.classList.add(fav);
+  if (heartBtn) {
+    heartBtn.classList.toggle(fav)
   }
 }
 
 function toggleDelete(e) {
-  console.log('attempting to delete')
   const card = e.parentElement.parentElement.parentElement;
-  const cardName = card.dataset.name;
-  const curLocalPokemon = JSON.parse(localStorage.getItem('pokemon'));
-  const cardNameIndex = curLocalPokemon.indexOf(cardName);
+  const curLocalPokemon = Array.from(JSON.parse(localStorage.getItem('pokemon')));
+  const curLocalPokemonNames = curLocalPokemon.map((pokemon) => pokemon.name);
+  const cardNameIndex = curLocalPokemonNames.indexOf(card.dataset.name);
   curLocalPokemon.splice(cardNameIndex, 1);
   localStorage.setItem('pokemon', JSON.stringify(curLocalPokemon));
   card.parentElement.removeChild(card);
@@ -304,10 +167,12 @@ function toggleDelete(e) {
 }
 
 function handleFavPokemonLs(e) {
-  const card = e.parentElement.parentElement;
+  const card = e.parentElement.parentElement.parentElement;
+  console.log(card)
   const curLocal = JSON.parse(localStorage.getItem('fav-pokemon'));
-  const cardId = card.dataset.pokeId;
-  if (curLocal === null) {
+  const cardId = card.id;
+  console.log(cardId)
+  if (curLocal === null || curLocal.length === 0) {
     const favArr = [];
     favArr.push(cardId);
     localStorage.setItem('fav-pokemon', JSON.stringify(favArr));
@@ -345,45 +210,142 @@ function addEventListenersForHeart() {
   });
 }
 
-function updatePokemonLs() {
-  const pokemonArray = Array.from(document.querySelectorAll('.pokemon-card'));
-  const pokemonNames = [];
-  pokemonArray.forEach((pokemon) => pokemonNames.push(pokemon.dataset.name))
-  localStorage.setItem('pokemon', JSON.stringify(pokemonNames))
-}
-
-function addPokemonWeightType(pokeCards, data) {
-  for (card of pokeCards) {
-    const weight = parseInt(data.weight, 10);
-    if (weight < 100) {
-      card.dataset.weightType = light;
-    } else if (weight >= 100 && weight <= 500) {
-      card.dataset.weightType = average;
-    } else {
-      card.dataset.weightType = heavy;
+//Creates all html elements for pokemon cards
+function createFavBtn(data) {
+  const favPokeIds = JSON.parse(localStorage.getItem('fav-pokemon'));
+  const favBtn = document.createElement('div');
+  favBtn.classList.add('fav-btn');
+  const heart = document.createElement('i');
+  heart.classList.add('fa-solid');
+  heart.classList.add('fa-heart');
+  heart.classList.add('heart-icon');
+  heart.setAttribute('id', `heart-${data.id}`);
+  if (favPokeIds !== null) {
+    if (favPokeIds.includes(String(data.id))) {
+      heart.classList.add('is-fav');
     }
   }
-  return pokeCards;
+  favBtn.appendChild(heart);
+  return favBtn;
 }
 
+function createDeleteBtn() {
+  const deleteBtn = document.createElement('div');
+  deleteBtn.classList.add('delete-btn');
+  const xBtn = document.createElement('i');
+  xBtn.classList.add('fa-solid');
+  xBtn.classList.add('fa-x');
+  deleteBtn.appendChild(xBtn);
+  return deleteBtn;
+}
+
+function combineFavDeleteBtns(fav, del) {
+  const favDeleteBar = document.createElement('div');
+  favDeleteBar.classList.add('fav-delete-bar');
+  favDeleteBar.appendChild(fav);
+  favDeleteBar.appendChild(del)
+  return favDeleteBar
+}
+
+function createImgWrap(data) {
+  const imgWrap = document.createElement('div');
+  const pokeImg = document.createElement('img');
+  pokeImg.src = data.src;
+  imgWrap.classList.add('pokemon-img-wrapper');
+  imgWrap.appendChild(pokeImg);
+  return imgWrap;
+}
+
+function createAtkHpDef(data) {
+  const pokeBar = document.createElement('div');
+  pokeBar.classList.add('pokemon-power-bar');
+  const pokeAtk = document.createElement('div');
+  const pokeHp = document.createElement('div');
+  const pokeDef = document.createElement('div');
+  const pokeAtkNode = document.createTextNode('ATK: ' + data.atk);
+  const pokeHpNode = document.createTextNode('HP: ' + data.hp);
+  const pokeDefNode = document.createTextNode('DEF: ' + data.def);
+  pokeAtk.append(pokeAtkNode);
+  pokeHp.append(pokeHpNode);
+  pokeDef.append(pokeDefNode);
+  pokeBar.appendChild(pokeAtk);
+  pokeBar.appendChild(pokeHp);
+  pokeBar.appendChild(pokeDef);
+  return pokeBar;
+}
+
+function createPokeName(data) {
+  const pokeName = document.createElement('h2');
+  const pokeNameNode = document.createTextNode(`${data.name}`);
+  pokeName.classList.add('lg-text');
+  pokeName.appendChild(pokeNameNode);
+  return pokeName;
+}
+
+function createPokeId(data) {
+const pokeId = document.createElement('p');
+const pokeIdNode = document.createTextNode(`#${data.id}`)
+pokeId.appendChild(pokeIdNode);
+pokeId.classList.add('small-text');
+return pokeId;
+}
+
+function createPokemonAbilities(data) {
+  const abilitiesDiv = document.createElement('div');
+  abilitiesDiv.classList.add('pokemon-abilities')
+  const abilitiesText = document.createElement('h3');
+  const abilitiesTextNode = document.createTextNode('Abilities');
+  abilitiesText.appendChild(abilitiesTextNode);
+  abilitiesText.classList.add('med-text');
+  abilitiesDiv.appendChild(abilitiesText);
+  for (ability of data.abilities) {
+    const newP = document.createElement('p');
+    const newPNode = document.createTextNode(`${ability}`);
+    newP.classList.add('small-text');
+    newP.appendChild(newPNode);
+    abilitiesDiv.appendChild(newP);
+  }
+  return abilitiesDiv;
+}
+
+function createPokemonTypes(data) {
+  const pokeTypes = document.createElement('div');
+  const pokeTypesTitle = document.createElement('h3');
+  const pokeTypesTitleNode = document.createTextNode('Types');
+  pokeTypesTitle.classList.add('med-text');
+  pokeTypesTitle.append(pokeTypesTitleNode);
+  pokeTypes.appendChild(pokeTypesTitle);
+  pokeTypes.classList.add('pokemon-types');
+    for (type of data.types) {
+      const pokeType = document.createElement('p');
+      const pokeTypeNode = document.createTextNode(`${type}`);
+      pokeType.setAttribute('type', type);
+      pokeType.appendChild(pokeTypeNode);
+      pokeType.classList.add('small-text');
+      pokeTypes.appendChild(pokeType);
+    }
+  return pokeTypes;
+}
+
+function combineAbilitiesTypes(ability, type) {
+  const newDiv = document.createElement('div');
+  newDiv.classList.add('pokemon-abilities-types')
+  newDiv.appendChild(ability);
+  newDiv.appendChild(type);
+  return newDiv;
+}
+
+//Creates a Single pokemon card with all datasets and html elements
 function handleSinglePokemon(data) {
   const pokeCard = document.createElement(`div`);
   pokeCard.classList.add('pokemon-card');
   pokeCard.setAttribute('id', data.id)
   pokeCard.dataset.name = data.name;
-  pokeCard.dataset.pokeId = data.id;
-  pokeCard.dataset.hp = data.stats[0].base_stat;
-  pokeCard.dataset.atk = data.stats[1].base_stat;
-  pokeCard.dataset.def = data.stats[2].base_stat;
+  pokeCard.dataset.hp = data.hp;
+  pokeCard.dataset.atk = data.atk;
+  pokeCard.dataset.def = data.def;
   pokeCard.dataset.weight = data.weight;
-  const weight = parseInt(data.weight, 10);
-  if (weight < 100) {
-    pokeCard.dataset.weightType = 'light';
-  } else if (weight >= 100 && weight <= 500) {
-    pokeCard.dataset.weightType = 'average';
-  } else {
-    pokeCard.dataset.weightType = 'heavy';
-  }
+  pokeCard.dataset.weightType = data.weightType;
   const cardDetails = [
     combineFavDeleteBtns(createFavBtn(data), createDeleteBtn()),
     createImgWrap(data), 
@@ -398,49 +360,99 @@ function handleSinglePokemon(data) {
   return pokeCard;
 }
 
-function createPokemonCards(thisData) {
-  const pokeCards = [];
-  if (!Array.isArray(thisData)) {
-    const pokeCard = handleSinglePokemon(thisData);
-    return pokeCard
+// checks for fav pokemon adds the is-fav class
+function checkFavPokemonLs(card) {
+  const thisCard = card;
+  const thisBtn = thisCard.querySelector('.heart-icon');
+  const favPokeIds = JSON.parse(localStorage.getItem('fav-pokemon')) || [];
+  if (favPokeIds.includes(thisBtn.getAttribute('id'))) {
+    toggleFav(thisBtn.getAttribute('id'));
+  }
+}
+
+function addToPokemonLs(data) {
+  const pokemonArray = JSON.parse(localStorage.getItem('pokemon')) || [];
+  const pokemon = data;
+  pokemonArray.push(pokemon)
+  localStorage.setItem('pokemon', JSON.stringify(pokemonArray))
+}
+
+function storePokemonAbilities(data) {
+  const abilities = [];
+  for (index in data.abilities) {
+    abilities.push(data.abilities[index].ability.name)
+  }
+  return abilities
+}
+
+function storePokemonTypes(data) {
+  const types = [];
+  if (data.types.length === data.abilities.length) {
+    for (let i = 0; i < data.abilities.length; i++) {
+      types.push(data.types[i].type.name);
+    }
   } else {
-    for (data of thisData) {
-      const pokeCard = handleSinglePokemon(data);
+    for (let i = 0; i < data.abilities.length; i++) {
+      types.push(data.types[0].type.name)
+    }
+  }
+  return types
+}
+
+function storePokemonWeightType(data) {
+  if (data.weight < 100) {
+    return 'light';
+  } else {
+    return data.weight < 500 ? 'average' : 'heavy';
+  }
+}
+
+function storePokemonData(data) {
+  const pokemon = {
+    name: data.name,
+    id: data.id, 
+    src: data.sprites && data.sprites.front_default ? data.sprites.front_default : 'default-image-url',
+    hp: data.stats[0].base_stat,
+    atk: data.stats[1].base_stat,
+    def: data.stats[2].base_stat,
+    abilities: storePokemonAbilities(data),
+    types: storePokemonTypes(data),
+    weight: data.weight, 
+    weightType: storePokemonWeightType(data),
+  }
+  const curPokemon = JSON.parse(localStorage.getItem('pokemon')) || []
+  curPokemon.push(pokemon)
+  localStorage.setItem('pokemon', JSON.stringify(curPokemon))
+  return pokemon;
+}
+
+function createPokemonCards(pokemon) {
+  const pokeCards = [];
+  if (!Array.isArray(pokemon)) {
+    const pokeCard = handleSinglePokemon(pokemon);
+    return pokeCard;
+  } else {
+    for (singlePokemon of pokemon) {
+      const pokeCard = handleSinglePokemon(singlePokemon);
       pokeCards.push(pokeCard);
     }
     return pokeCards;
   }
 }
 
-// checks for fav pokemon adds the is-fav class
-function checkFavPokemonLs(card) {
-  const thisCard = card;
-  const thisBtn = thisCard.querySelector('.heart-icon');
-  const favPokeIds = JSON.parse(localStorage.getItem('fav-pokemon'));
-  if (favPokeIds !== null) {
-    if (favPokeIds.length > 1) {
-      for (let i = 0; i < favPokeIds.length; i++) {
-        if (favPokeIds[i] === thisBtn.getAttribute('id')) {
-          toggleFav(thisBtn.getAttribute('id'));
-        }
-      }
-    } else {
-      toggleFav(favPokeIds[0]);
-    }
-  }
-}
 
 //Displays pokemon on screen updates pokemon ls
-function addPokemonCard(data) {
+function addPokemonCard(pokemonData) {
   const pokemon = document.querySelector('div.pokemon');
-  const pokemonCards = createPokemonCards(data);
-  for (card of pokemonCards) {
-    checkFavPokemonLs(card);
-    pokemon.appendChild(card);
+  if(Array.isArray(pokemonData)) {
+    for (card of pokemonData) {
+      pokemon.appendChild(card);
+    }
+  } else {
+    pokemon.appendChild(pokemonData);
   }
   updateDisplay();
-  updatePokemonLs();
-  return data;
+  return pokemonData;
 }
 
 
@@ -448,104 +460,149 @@ function addPokemonCard(data) {
 function addPokemonCardSearch(data, updateLocal) {
   const pokemon = document.querySelector('div.pokemon');
   const prevPokemonCards = Array.from(document.querySelectorAll('.pokemon-card'));
-  const pokemonCard = createPokemonCards(data);
+  const pokemonCard = data;
   prevPokemonCards.push(pokemonCard);
   pokemon.innerHTML = '';
   prevPokemonCards.forEach((card) => {
     pokemon.appendChild(card);
   })
   if (updateLocal) {
-    updatePokemonLs(pokemonCard);
+    const pokemonArray = JSON.parse(localStorage.getItem('pokemon')) || [];
+    pokemonArray.push(pokemonCard);
+    localStorage.setItem('pokemon', JSON.stringify(prevPokemonCards));
   }
   updateDisplay();
   return data;
+}
+
+async function handlePokeSearch(newPokemon) {
+  const pokemon = document.getElementById('poke-search');
+  const curPokemon = JSON.parse(localStorage.getItem('pokemon')) || [];
+  const curPokemonNames = curPokemon.map((pokemon) => pokemon.name)
+  const pokemonTextContainer = document.getElementById('pokemon-search-result');
+  let duplicatePokemonText = document.createTextNode(`You already have ${newPokemon}`);
+  if (!curPokemonNames.includes(newPokemon)) {
+    duplicatePokemonText = document.createTextNode(`You have chosen ${newPokemon} :)`);
+  }
+  pokemonTextContainer.innerHTML = '';
+  pokemonTextContainer.appendChild(duplicatePokemonText);
+}
+
+// requests pokemon search data from api
+async function findPokemon(input, updateLocal) {
+  try {
+    const pokeApiSearch = `https://pokeapi.co/api/v2/pokemon/${input}`;
+    const response = await fetch(pokeApiSearch);
+    if (!response.ok) {
+      throw new Error(`failed to find ${input}`);
+    }
+
+    const dataText = await response.text();
+
+    const data = JSON.parse(dataText);
+    const pokemonArray = JSON.parse(localStorage.getItem('pokemon')) || [];
+    const pokemonNames = pokemonArray.map((pokemon) => pokemon.name);
+    handlePokeSearch(data.name);
+    if (pokemonNames.includes(data.name)) {
+      return
+    }
+    const pokemonData = storePokemonData(data);
+    const pokemonCard = createPokemonCards(pokemonData);
+    if(updateLocal) {
+      try {
+        pokemonArray.push(pokemonData);
+        localStorage.setItem('pokemon', JSON.stringify(pokemonArray));
+      } catch (localStorageError) {
+        console.error("Error updating local storage:", localStorageError);
+      }
+    }
+    addPokemonCardSearch(pokemonCard);
+    return pokemonData;
+  } catch (error) {
+    if (error instanceof TypeError) {
+      console.error("TypeError:", error.message);
+      // Handle TypeError differently
+    } else if (error instanceof SyntaxError) {
+      console.error("SyntaxError:", error.message);
+      // Handle SyntaxError differently
+    } else {
+      console.error("Unexpected error:", error);
+    }
+  }
 }
 
 function handleOnclickApiSearch () {
   const pokemon = document.getElementById('poke-search');
   findPokemon(pokemon.value, true)
 }
-// returns pokemon data from api
-function findPokemon(input, updateLocal) {
-  return new Promise(function(resolve, reject){
-    const pokeApiSearch = `https://pokeapi.co/api/v2/pokemon/${input}`;
-    fetch(pokeApiSearch)
-      .then((response) => response.json())
-      .then((response) => addPokemonCardSearch(response, updateLocal))
-      .then(handlePokeSearch())
-      .catch((error) => {
-        const pokemonTextContainer = document.getElementById('pokemon-search-result');
-        pokemonTextContainer.innerHTML = '';
-        const failedPokemonText = document.createTextNode(`Failed to find ${input}`)
-        pokemonTextContainer.appendChild(failedPokemonText);
-        return error;
-      });
-  })
-}
 
 // loads requested pokemon on screen
-function loadLocalPokemon(curLocalPokemon) {
+function loadPokemon(pokemonToLoad, curPokemonArray) {
   const pokemonContainer = document.querySelector('.pokemon');
   pokemonContainer.innerHTML = '';
-  const pokemonArray = curLocalPokemon;
-  if (Array.isArray(pokemonArray)) {
-    pokemonArray.map((pokemon) => findPokemon(pokemon, false))
-    const pokemonCards = addPokemonCard(pokemonArray);
-    pokemonCards.forEach((pokemon) => pokemonContainer.appendChild(pokemon));
-    addEventListenersForHeart();
+  const matchedPokemon = [];
+  if (pokemonToLoad.length === 0) {
+    const prevPokemon = createPokemonCards(curPokemonArray);
+    prevPokemon.forEach((pokemon) => pokemonContainer.appendChild(pokemon));
   } else {
-    const pokemon = findPokemon(pokemonArray, false);
-    const pokemonCard = addPokemonCard(pokemon);
-    pokemonContainer.appendChild(pokemonCard);
+    for(pokemon of curPokemonArray) {
+      if (pokemonToLoad === pokemon.name || pokemonToLoad.includes(pokemon.name)) {
+        matchedPokemon.push(pokemon);
+      }
+    }
+    const pokemonArray = createPokemonCards(matchedPokemon);
+    if (Array.isArray(pokemonArray)) {
+      pokemonArray.forEach((pokemon) => pokemonContainer.appendChild(pokemon));
+    } else {
+      pokemonContainer.appendChild(pokemonArray);
+    }
     addEventListenersForHeart();
+    updateDisplay();
   }
-  updateDisplay();
 }
 
 function handlePokemonOnLoad(data) {
   const curLocalPokemon = JSON.parse(localStorage.getItem('pokemon'))
-  curLocalPokemon === null ? addPokemonCard(data) : loadLocalPokemon(curLocalPokemon);
-}
-
-async function handlePokeSearch() {
-  const pokemon = document.getElementById('poke-search');
-  const curPokemon = JSON.parse(localStorage.getItem('pokemon'))
-  const pokemonTextContainer = document.getElementById('pokemon-search-result');
-  let duplicatePokemonText = '';
-  if (curPokemon.includes(pokemon.value)) {
-    duplicatePokemonText = document.createTextNode(`You already have ${pokemon.value} :)`);
-  } else {
-    duplicatePokemonText = document.createTextNode(`You have chosen ${pokemon.value}`);
-  }
-  pokemonTextContainer.innerHTML = '';
-  pokemonTextContainer.appendChild(duplicatePokemonText);
+  curLocalPokemon === null ? addPokemonCard(data) : loadPokemon(curLocalPokemon);
 }
 
 function handlePokedexSearch() {
   const pokemonSearch = document.getElementById('pokedex-search');
-  const curPokemonArray = JSON.parse(localStorage.getItem('pokemon'));
+  const curPokemonArray = JSON.parse(localStorage.getItem('pokemon')) || [];
+  const curPokemonNames = curPokemonArray.map((pokemon) => pokemon.name)
   const possiblePokemonArray = [];
-  for (let pokemon of curPokemonArray) {
+  for (let pokemon of curPokemonNames) {
     if (pokemon.includes(pokemonSearch.value)) {
       possiblePokemonArray.push(pokemon);
     }
   }
   if (pokemonSearch.value === '') {
-    loadLocalPokemon(curPokemonArray);
+    return loadPokemon([], curPokemonArray);
   }
-  return loadLocalPokemon(possiblePokemonArray);
+  return loadPokemon(possiblePokemonArray, curPokemonArray);
 }
   
 
+if (JSON.parse(localStorage.getItem('pokemon')) === null || JSON.parse(localStorage.getItem('pokemon')).length === 0) {
+  Promise
+  .all(pokemonPromises)
+  .then((pokemonData) => pokemonData.map((pokemon) => storePokemonData(pokemon)))
+  .then((pokemon) => createPokemonCards(pokemon))
+  .then((pokemonCards) => {
+    pokemonCards.forEach((card) => {
+      checkFavPokemonLs(card);
+      addPokemonCard(card)
+    })
+  })
+  .catch((error) => console.error(error));
+} else {
+  const pokemonData = JSON.parse(localStorage.getItem('pokemon'));
+  const pokemonCards = createPokemonCards(pokemonData);
+  pokemonCards.forEach((card) => {
+    checkFavPokemonLs(card);
+    addPokemonCard(card)
+  })
+}
 
-Promise
-  .all([bulbasaur, ivysaur, venusaur, charmander, charmeleon, charizard, squirtle, wartortle, blastoise, pikachu, pichu, clefairy])
-  .then((response) => {
-    return Promise.all(response.map((res) => res.json()));
-  })
-  .then((data) => {
-    return handlePokemonOnLoad(data);
-  })
-  .catch((error) => error);
 eventPokemonStats();
 addEventListenersForHeart();
