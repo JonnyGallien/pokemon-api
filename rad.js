@@ -14,20 +14,6 @@ const pokemonPromises = pokemonNames.map((name) => {
 
 const basePokemon = 0;
 
-const observerConfig = { childList: true, subtree: true };
-
-function addHiddenClass (elm) {
-  if (!elm.classList.contains('hidden')) {
-    elm.classList.add('hidden')
-  }
-  return elm
-}
-
-function removeHiddenClass (elm) {
-  elm.classList.remove('hidden');
-  return elm
-}
-
 function handlePokeWeights() {
   const pokeCards = Array.from(document.querySelectorAll('.pokemon-card'));
   let light = 0;
@@ -59,14 +45,16 @@ const filterHeavyPokemon = () => {
 };
 
 function filterPokemonWeight(weight) {
-  const pokemonCards = Array.from(document.querySelectorAll('.pokemon-card'));
-  const filteredOutCards = pokemonCards.filter((card) => card.dataset.weightType !== weight);
-  filteredOutCards.forEach((card) => addHiddenClass(card))
-  const filteredCards = pokemonCards.filter((card) => card.dataset.weightType === weight)
-  filteredCards.forEach((card) => removeHiddenClass(card));
-  updateDisplay()
+  const pokemonContainer = document.querySelector('.pokemon');
+  const pokemonData = JSON.parse(localStorage.getItem('pokemon'))
+  const pokemonCards = createPokemonCards(pokemonData);
+  const filteredCards = pokemonCards.filter((card) => card.dataset.weightType === weight);
+  pokemonContainer.innerHTML = '';
+  filteredCards.forEach((card) => pokemonContainer.appendChild(card));
+  updateDisplay();
 }
 
+// This function is in case there is future data wished to be tracked anytime there is a change in pokemon
 function updateDisplay() {
   handlePokeWeights();
 }
@@ -130,10 +118,12 @@ function eventPokemonStats() {
 }
 
 function seeAll() {
-  const pokemonData = JSON.parse(localStorage.getItem('pokemon'))
+  const pokemonContainer = document.querySelector('.pokemon');
+  const pokemonData = JSON.parse(localStorage.getItem('pokemon'));
   const pokemonCards = createPokemonCards(pokemonData);
   pokemonCards.map((card) => checkFavPokemonLs(card));
-  loadPokemon(pokemonCards);
+  pokemonContainer.innerHTML = '';
+  pokemonCards.map((card) => pokemonContainer.appendChild(card));
   updateDisplay();
 }
 
@@ -168,10 +158,8 @@ function toggleDelete(e) {
 
 function handleFavPokemonLs(e) {
   const card = e.parentElement.parentElement.parentElement;
-  console.log(card)
   const curLocal = JSON.parse(localStorage.getItem('fav-pokemon'));
   const cardId = card.id;
-  console.log(cardId)
   if (curLocal === null || curLocal.length === 0) {
     const favArr = [];
     favArr.push(cardId);
@@ -276,7 +264,7 @@ function createAtkHpDef(data) {
 
 function createPokeName(data) {
   const pokeName = document.createElement('h2');
-  const pokeNameNode = document.createTextNode(`${data.name}`);
+  const pokeNameNode = document.createTextNode(`${data.name.toUpperCase()}`);
   pokeName.classList.add('lg-text');
   pokeName.appendChild(pokeNameNode);
   return pokeName;
@@ -519,6 +507,9 @@ async function findPokemon(input, updateLocal) {
     addPokemonCardSearch(pokemonCard);
     return pokemonData;
   } catch (error) {
+    const searchResultText = document.getElementById('pokemon-search-result');
+    const searchResultTextNode = document.createTextNode('Sorry, we could not find your pokemon :(');
+    searchResultText.append(searchResultTextNode);
     if (error instanceof TypeError) {
       console.error("TypeError:", error.message);
       // Handle TypeError differently
@@ -541,7 +532,7 @@ function loadPokemon(pokemonToLoad, curPokemonArray) {
   const pokemonContainer = document.querySelector('.pokemon');
   pokemonContainer.innerHTML = '';
   const matchedPokemon = [];
-  if (pokemonToLoad.length === 0) {
+  if (pokemonToLoad.length < 1) {
     const prevPokemon = createPokemonCards(curPokemonArray);
     prevPokemon.forEach((pokemon) => pokemonContainer.appendChild(pokemon));
   } else {
