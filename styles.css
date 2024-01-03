@@ -2,6 +2,10 @@
 
 .poke-title {
   text-align: center;
+  font-size: 4em;
+  font-family: 'Arial', sans-serif;
+  animation: rainbowAnimation 10s linear infinite;
+  border-bottom: 4px dotted;
 }
 
 .pokedex-search-box {
@@ -13,6 +17,7 @@
 
 .pokedex-search, .pokedex-search-btn {
   border: none;
+  border-radius: 10px;
   padding: 2px;
   font-size: 1rem;
   background-color: tan;
@@ -160,10 +165,11 @@ flex: 5;
 }
 
 .pokemon-card {
-  border: 1px solid black;
+  border: 2px solid black;
   background-color: white;
+  border-radius: 4px;
   min-width: 250px;
-  height: 492px;
+  height: 430px;
   padding: 4px;
   margin: 0.5rem 1rem;
   text-align: center;
@@ -255,6 +261,22 @@ i.is-fav {
   display: none;
 }
 
+.animated-heartbeat {
+  animation: heartbeat 0.5s steps(2);
+  animation-iteration-count: 2;
+}
+
+@keyframes rainbowAnimation {
+  0% {color: red;}
+  12.5% {color: orange;}
+  25% {color: yellow;}
+  37.5% {color: green;}
+  50% {color: blue;}
+  75% {color: indigo;}
+  87.5% {color: violet;}
+  100% {color: red;}
+}
+
 @keyframes bounce {
   0% { transform: translateY(0); }
   25% {transform :translateY(-6px);}
@@ -267,9 +289,4 @@ i.is-fav {
   0% { transform: scale(1); }
   50% { transform: scale(1.3); }
   100% { transform: scale(1); }
-}
-
-.animated-heartbeat {
-  animation: heartbeat 0.5s steps(2);
-  animation-iteration-count: 2;
 }
